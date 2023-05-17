@@ -130,7 +130,7 @@ metadata:
 spec:
   type: LoadBalancer
   externalIPs:
-    - 18.170.88.176
+    - 172.31.46.138
   selector:
     app.kubernetes.io/name: website-deployment
   ports:
