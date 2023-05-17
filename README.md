@@ -60,8 +60,8 @@ Burada dikkat etmemiz gereken şey amazon free tier olarak bize t2.micro olan ma
 sonrasında k3s bir cluster olarak değilde tek node üzerinden kuracağımız için yapılandırma ayarlarını geçerek aşağıdaki şekilde indirdim.
 
 > curl -sfL https://get.k3s.io | sh -
-sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-kubectl get nodes
+> sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+> kubectl get nodes
 
 ![enter image description here](https://github.com/fatihaydnrepo/TheDevopsResumeChallange/blob/main/Screenshot%20from%202023-05-17%2000-47-35.png?raw=true)
 
