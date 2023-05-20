@@ -190,4 +190,4 @@ spec:
 komutu ile oluşturduğumuz website_ingress dosyasını apply edebiliriz. 
 
 website_ingress dosyasında bulunan "ingressClassName": Ingress kontrolcüsünün sınıfını belirtir. biz helm ile oluşturduğumuz release sayesinde ingress dosyamızı nginx ile ilişkilendirdik. Bu sayede fatihayd.in adresine gelen istekler ingress sayesinde website-svc'nin bağlı olduğu pod'umuza ulaşacaktır.
-
+ 
