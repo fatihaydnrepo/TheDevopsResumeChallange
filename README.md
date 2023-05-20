@@ -1,3 +1,4 @@
+
 # THE JUNIOR DEVOPS RESUME CHALLANGE 
 
 Öncelikle bir static websitesi oluşturmak istedim bunun için html, css ve javascript içeren bir kod bloğunu kendim için yeniden tasarladım, sonrasında hazırlamış olduğum bu websitesini bir container haline getirmek için dockerfile'ını oluşturdum. 
@@ -44,11 +45,11 @@ Oluşturduğum image'i dockerhub'a göndermek için aşağıdaki komutu kulland�
 > docker push reptilianusbileciktus/website:v1
 
 Sonrasında farklı bir bilgisayardan bu image'i çekip çalıştığını doğruladım. 
-![Windows](https://github.com/fatihaydnrepo/TheDevopsResumeChallange/blob/main/WhatsApp%20Image%202023-05-17%20at%2000.28.01.jpeg?raw=true)
+![Windows](https://github.com/fatihaydnrepo/TheDevopsResumeChallange/blob/main/images/terminal.jpeg?raw=true)
 
 Websitemi ücretsiz bir şekilde yayınlamak için aws üzerinde bir hesap oluşturdum sonrasında EC2 ile website isimli bir instance oluşturdum.
 
-![enter image description here](https://github.com/fatihaydnrepo/TheDevopsResumeChallange/blob/main/Screenshot%20from%202023-05-17%2000-33-08.png?raw=true)
+![enter image description here](https://github.com/fatihaydnrepo/TheDevopsResumeChallange/blob/main/images/instance.png?raw=true)
 Bu instance ' e uygun olarak bir security ve target group'da oluşturdum bu hususta izlediğim adımlara [buradan ulaşabilirsiniz.](https://www.youtube.com/watch?v=JfuudtTiwgk)
 
 Burada dikkat etmemiz gereken şey amazon free tier olarak bize t2.micro olan makineler sunmakta ve   1 vCPU ve 1 GB RAM vermektedir.  Bu sebeple instance içerisine k3s kurarak ilerleyeceğiz. Oluşturduğumuz makine Minikube sistem gereksinimlerini karşılamamaktadır.
@@ -65,7 +66,7 @@ sonrasında k3s bir cluster olarak değilde tek node üzerinden kuracağımız i
 > 
 > kubectl get nodes
 
-![enter image description here](https://github.com/fatihaydnrepo/TheDevopsResumeChallange/blob/main/Screenshot%20from%202023-05-17%2000-47-35.png?raw=true)
+![enter image description here](https://github.com/fatihaydnrepo/TheDevopsResumeChallange/blob/main/images/nodes.png?raw=true)
 
 Kubectl komutununda çalıştığını doğruladıktan sonra uygulamamızın çalışacağı pod'u oluşturmak ve düzenlemek için deploymant.yaml adında bir dosya oluşturdum ve aşağıdaki komutları girdim 
 
@@ -89,6 +90,7 @@ spec:
           image: reptilianusbileciktus/website:v1
           ports:
             - containerPort: 8080
+
 ```
 
 Yukarıdaki komutlar neyi ifade ediyor ? 
@@ -128,15 +130,14 @@ kind: Service
 metadata:
   name: website-svc
 spec:
-  type: LoadBalancer
-  externalIPs:
-    - 172.31.46.138
+  type: ClusterIP
   selector:
-    app.kubernetes.io/name: website-deployment
+    app.kubernetes.io/name: website-deployment-57ddb9ddf6-tsgnf
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8080
+
 
 ```
 Burada farklı olarak spec'in altında bulunan kısımlarda type olarak bir LoadBalancer olduğunu belirttim bunun sebebi dışarıdan gelen talepleri belirtilen port üzerinden hedeflenen pod'lara dağıtacak bir yük dengeleyici sağlamaktır ayrıca ; 
@@ -148,50 +149,45 @@ Burada farklı olarak spec'in altında bulunan kısımlarda type olarak bir Load
 
 > kubectl apply -f service.yaml
 
-Komutunu çalıştırarak YAML dosyasında bulunan service objemizin çalışmasını sağlıyoruz..
+Komutunu çalıştırarak YAML dosyasında bulunan service objemizin çalışmasını sağlıyoruz.
 
 > kubectl get svc -o wide
 
 ile service'imizin doğru şekilde  oluşup oluşmadığını kontrol ediyoruz.
 
+
+Helm ile nginx-ingress controller objemizi oluşturduk
+
+> helm install nginx-ingress oci://ghcr.io/nginxinc/charts/nginx-ingress --version 0.17.1 --set controller.service.loadBalancerIP=18.170.86.176
+
+
 # buraya resim
 
-sonrasında traefik.yaml dosyası oluşturdum
+sonrasında website_ingress dosyası oluşturdum
 ```json                             
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: website-route
+  name: ingress-website
 spec:
-  entryPoints:
-    - web
-  routes:
-    - match: Host(`18.170.88.176`)
-      kind: Rule
-      services:
-        - name: website-svc
-          port: 80
+  ingressClassName: nginx
+  rules:
+  - host: fatihayd.in
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: website-svc
+            port:
+              number: 8080
+
 ```
 
--   `apiVersion: traefik.containo.us/v1alpha1` ve `kind: IngressRoute` satırları, Traefik IngressRoute nesnesini oluşturacağımızı belirtir.
-   
--   `spec` bölümü, IngressRoute'un yapılandırmasını tanımlamaktadır.
-    
-    -   `entryPoints` bölümü, gelen isteklerin hangi entry point'ten kabul edileceğini belirtir. Bu durumda, "web" entry point'i kullanılıyor. (etrypoint gelen isteklerin kabul edildiği noktayı ifade etmektedir.)
-        
-	- `routes` bölümü, gelen isteklerin nasıl yönlendirileceğini belirtir. Bu bölümdeki yapılandırma, gelen isteklerin belirli bir kurala göre hedef bir hizmete yönlendirilmesini sağlar.
-	-   `match` alanı, isteklerin nasıl eşleştirileceğini belirtir. Burada, `Host(`18.170.88.176`)` ifadesi kullanarak, gelen isteklerin "18.170.88.176" IP adresiyle eşleşmesi gerektiğini belirtiyoruz. Yani, sadece bu IP adresine gelen istekler bu kurala uygun olacaktır.
-    
-	-   `kind: Rule` ifadesiyle bu yönlendirmenin bir kural olarak yapılandırıldığını belirtiyoruz. Bu kural, gelen isteklerin belirli bir ölçüte (host adresine göre eşleşme) dayalı olarak yönlendirilmesini sağlar.
-    
-	-   `services` bölümü, yönlendirilen isteklerin hangi hizmete yönlendirileceğini belirtir. Burada, "website-svc" adlı hizmeti belirtiyoruz. Yani, bu kurala uyan istekler, belirtilen hizmete yönlendirilecektir.
+> kubectl apply -f website_ingress.yaml
 
-> kubectl apply -f traefik.yaml
+komutu ile oluşturduğumuz website_ingress dosyasını apply edebiliriz. 
 
-Komutunu çalıştırarak traefik.yaml dosyasını apply ediyoruz.
+website_ingress dosyasında bulunan "ingressClassName": Ingress kontrolcüsünün sınıfını belirtir. biz helm ile oluşturduğumuz release sayesinde ingress dosyamızı nginx ile ilişkilendirdik. Bu sayede fatihayd.in adresine gelen istekler ingress sayesinde website-svc'nin bağlı olduğu pod'umuza ulaşacaktır.
 
-Traefik IngressRoute, gelen isteklerin belirlediğimiz ölçütlere göre nasıl yönlendirileceğini ve hangi hizmete yönlendirileceğini belirtir. Burada `Host(`18.170.88.176`)` ile eşleşen istekler,  Service'e yönlendirilir. Yani, IngressRoute, istemcilerin belirli bir IP veya alan adına yönlendirilmesini sağlar.
-
-Kubernetes Service ise, belirli bir hizmetin erişilebilirliğini sağlar. LoadBalancer tipi Service, dışarıdan erişim sağlamak için bir yük dengeleyici IP'si kullanılmasını sağlar. Bu sayede, dış IP adresine gelen istekler Service'e yönlendirilir.
-
-Yani, Traefik IngressRoute, gelen istekleri doğru hizmete yönlendirmek için kullanılırken, Kubernetes Service ise hizmetin erişilebilirliğini sağlamak için kullanılır. İkisini birlikte kullanarak, gelen isteklerin doğru hizmete yönlendirilmesini ve hizmetin dışarıdan erişilebilir olmasını sağlamış olursunuz.
