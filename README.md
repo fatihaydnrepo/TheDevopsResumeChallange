@@ -122,7 +122,8 @@ Komutunu çalıştırarak YAML dosyasında bulunan Deployment objesinin Kubernet
 
 ile podumuzun oluşup oluşmadığını kontrol ediyoruz.
 
-# buraya resim
+![enter image description here](https://github.com/fatihaydnrepo/TheDevopsResumeChallange/blob/main/images/nodes.png?raw=true)
+
 Sonrasında service.yaml dosyası oluşturdum
 ```json                             
 apiVersion: v1
@@ -155,13 +156,12 @@ Komutunu çalıştırarak YAML dosyasında bulunan service objemizin çalışmas
 
 ile service'imizin doğru şekilde  oluşup oluşmadığını kontrol ediyoruz.
 
+![enter image description here](https://github.com/fatihaydnrepo/TheDevopsResumeChallange/blob/main/images/svc.png?raw=true)
 
 Helm ile nginx-ingress controller objemizi oluşturduk
 
 > helm install nginx-ingress oci://ghcr.io/nginxinc/charts/nginx-ingress --version 0.17.1 --set controller.service.loadBalancerIP=18.170.86.176
 
-
-# buraya resim
 
 sonrasında website_ingress dosyası oluşturdum
 ```json                             
@@ -186,6 +186,8 @@ spec:
 ```
 
 > kubectl apply -f website_ingress.yaml
+
+![enter image description here](https://github.com/fatihaydnrepo/TheDevopsResumeChallange/blob/main/images/ingress.png?raw=true)
 
 komutu ile oluşturduğumuz website_ingress dosyasını apply edebiliriz. 
 
