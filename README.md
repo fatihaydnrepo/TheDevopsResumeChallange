@@ -142,8 +142,7 @@ spec:
 
 ```
 Burada farklı olarak spec'in altında bulunan kısımlarda type olarak bir LoadBalancer olduğunu belirttim bunun sebebi dışarıdan gelen talepleri belirtilen port üzerinden hedeflenen pod'lara dağıtacak bir yük dengeleyici sağlamaktır ayrıca ; 
--   `externalIPs` bölümü, kısmında "18.170.88.176" IP adresi dışarıdan erişim sağlamak için kullanılacak IP adresi olarak belirledim, bu benim instance'ımın ip adresi
-    
+
 -   `selector` bölümü, Service'in hangi pod'ları hedef alacağını belirtmektedir.
     
 -   `ports` bölümü, Service'in hangi portunu dinleyeceğini ve hangi pod portuna yönlendirme yapacağını belirtir. Bu durumda, Service 80 numaralı portu dinleyecek ve gelen trafiği `targetPort` olarak belirtilen 8080 numaralı pod portuna yönlendirecektir.
