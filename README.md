@@ -1,4 +1,5 @@
 
+![enter image description here]([https://github.com/fatihaydnrepo/TheDevopsResumeChallange/blob/main/images/instance.png?raw=true](https://raw.githubusercontent.com/fatihaydnrepo/TheDevopsResumeChallange/main/images/figma.png))
 # THE JUNIOR DEVOPS RESUME CHALLANGE 
 
 Öncelikle bir static websitesi oluşturmak istedim bunun için html, css ve javascript içeren bir kod bloğunu kendim için yeniden tasarladım, sonrasında hazırlamış olduğum bu websitesini bir container haline getirmek için dockerfile'ını oluşturdum. 
